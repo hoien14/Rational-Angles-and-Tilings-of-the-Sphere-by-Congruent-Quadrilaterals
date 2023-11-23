@@ -1,0 +1,746 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 13.04.0 ] */
+
+/* [wxMaxima: input   start ] */
+/* PROGRAMME SOLVING ANGLES IN COOLSAET IDENTITY - TYPE III: SPORADIC CASE */;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* Necessary Package */
+load(fourier_elim)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* ------------------------ USER INPUT 1 ------------------------ */
+
+Gonality: 4;
+
+f_LB: 8;
+
+assume(f>=f_LB);
+
+Quad_Angles: [alpha, beta, gamma, delta];
+
+Ngon_Angles: copy(Quad_Angles);
+
+Ngon_Angle_Sum_Eq: lsum(ang, ang, Ngon_Angles)=(Gonality-2)*%pi + 4*%pi/f;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* ------------------------ USER INPUT 2 ------------------------ */
+
+
+Coolsaet_Id: sin(gamma-alpha/2)*sin(beta/2) = sin(alpha/2)*sin(delta-beta/2);
+
+Coolsaet_Diff: sin(gamma-alpha/2)*sin(beta/2) - sin(alpha/2)*sin(delta-beta/2);
+
+
+Myerson_Sol: [
+
+[1/21, 8/21, 1/14, 3/14]*%pi,
+[1/14, 5/14, 2/21, 5/21]*%pi,
+[4/21, 10/21, 3/14, 5/14]*%pi,
+[1/20, 9/20, 1/15, 4/15]*%pi,
+[2/15, 7/15, 3/20, 7/20]*%pi,
+[1/30, 3/10, 1/15, 2/15]*%pi,
+[1/15, 7/15, 1/10, 7/30]*%pi,
+[1/10, 13/30, 2/15, 4/15]*%pi,
+
+[4/15, 7/15, 3/10, 11/30]*%pi,
+[1/30, 11/30, 1/10, 1/10]*%pi,
+[7/30, 13/30, 3/10, 3/10]*%pi,
+[1/15, 4/15, 1/10, 1/6]*%pi,
+[2/15, 7/15, 1/6, 3/10]*%pi,
+[1/12, 5/12, 1/10, 3/10]*%pi,
+[1/10, 3/10, 1/6, 1/6]*%pi
+
+];
+
+
+
+Angle_Relations: [
+
+[gamma - alpha/2, beta/2, alpha/2, delta - beta/2],
+
+[%pi - ( gamma - alpha/2 ), beta/2, alpha/2, delta - beta/2],
+
+[gamma - alpha/2, beta/2, alpha/2, %pi - (delta - beta/2)],
+
+[%pi - ( gamma - alpha/2 ), beta/2, alpha/2, %pi - (delta - beta/2)],
+
+[-( gamma - alpha/2 ), beta/2, alpha/2, - (delta - beta/2)]
+
+];
+
+length(Angle_Relations);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+length(Myerson_Sol);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* ------------------------ FUNCTION INITIATION ------------------------ */
+
+Firstn(in_array, in_firstn):=block(
+    out_firstn_array: [],
+    if  (in_firstn > 0) 
+    and (length(in_array) >= in_firstn)
+    then (
+            for a_ind: 1 while a_ind <= in_firstn do (
+                out_firstn_array: append(out_firstn_array, [ in_array[a_ind] ])
+         )
+    ),
+    out_firstn_array
+);
+
+Lastn(in_array, in_lastn):=block(
+    out_lastn_array: [],
+    if  (in_lastn > 0) 
+    and (length(in_array) >= in_lastn)
+    then (
+            for a_ind: (length(in_array) - in_lastn + 1) thru length(in_array) do (
+                out_lastn_array: append(out_lastn_array, [ in_array[a_ind] ])
+         )
+    ),
+    out_lastn_array
+);
+
+
+Half_Split_Perm(in_list):=block(
+
+    out_hs_perm_list: [],
+
+    if ( length(in_list) > 0 )
+    then (
+
+            half_len: floor(length(in_list)/2),
+
+            half_1: Firstn(in_list,  half_len),
+            half_2: Lastn(in_list, length(in_list) - half_len),
+
+            perm_1: listify(permutations(half_1)),
+            perm_2: listify(permutations(half_2)),
+
+
+            for p1_ind: 1 thru length(perm_1) do (
+
+                for p2_ind: 1 thru length(perm_2) do (
+            
+                    combined_perm1: append([], perm_1[p1_ind], perm_2[p2_ind]),
+                    
+                    combined_perm2: append([], perm_2[p2_ind], perm_1[p1_ind]),
+
+                    out_hs_perm_list: append(out_hs_perm_list, [combined_perm1], [combined_perm2])
+
+                )
+
+            )
+
+    ),
+
+    out_hs_perm_list
+
+);
+
+
+Exists_Greater(in_list, in_val):=block(
+
+    exists_greater: false,
+
+    if (length(in_list)>0)
+    then (
+
+            for eg_ind: 1 thru length(in_list) do (
+                
+                if (in_list[eg_ind]>=in_val)
+                then (
+                        exists_greater: true,
+                        return(exists_greater)
+                )
+
+            )
+
+    ),
+
+    exists_greater
+
+);
+
+
+Exists_Less(in_list, in_val):=block(
+
+    exists_less: false,
+
+    if (length(in_list)>0)
+    then (
+
+            for es_ind: 1 thru length(in_list) do (
+                
+                if (in_list[es_ind]<in_val)
+                then (
+                        exists_less: true,
+                        return(exists_less)
+                )
+
+            )
+
+    ),
+
+    exists_less
+
+);
+
+Coeff_Cap(in_value):=block(
+
+    if (in_value = 0)
+    then ( return(in_value+1) )
+    else (
+            return( floor(2/in_value)+1 )
+    )
+
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* ------------------------ SOLUTIONS TO MYERSON'S IDENTITY ------------------------ */
+
+
+DISPLAY_PROGRESS: true;
+
+counter: 0;
+
+case_length: 4;
+
+ACTIVATE_POSITIVE_ANG_FILTER: true;
+
+ACTIVATE_UNDER_2PI_ANG_FILTER: true;
+
+
+
+ACTIVATE_AREA_FILTER: false;
+
+ACTIVATE_f_VALUE_FILTER: false;
+
+ACTIVATE_GEOM_INEQ_FILTER: false;
+
+
+Valid_Angle_Index_List: [];
+
+Full_Valid_Angle_Values: [];
+
+Valid_Angle_Value_List: [];
+
+for m_ind: 1 thru length(Myerson_Sol) do (
+
+    Perm_List: Half_Split_Perm(Myerson_Sol[m_ind]),
+
+    for p_ind:1 thru length(Perm_List) do (
+
+        for ar_ind:1 thru length(Angle_Relations) do (
+
+            case_vals: Perm_List[p_ind],
+            case_rels: Angle_Relations[ar_ind],        
+
+            case_eq_list: [ ],
+
+            for c_ind:1 thru case_length do (
+
+                case_eq_list: append( case_eq_list, 
+                                      [case_rels[c_ind]=case_vals[c_ind]])
+
+            ),
+
+            case_eq_list: append(case_eq_list, [Ngon_Angle_Sum_Eq]),     
+
+       
+            
+            case_ang_sols:  expand(fourier_elim( case_eq_list,
+                                    append( listofvars(Ngon_Angles) )
+                            )),
+            
+
+            case_f_ang_sols:  expand(fourier_elim( case_eq_list,
+                                    append( listofvars(Ngon_Angles), [f] )
+                              )),
+
+            if ( case_f_ang_sols # emptyset)
+            and ( case_ang_sols # emptyset )
+            and ( assoc(f, case_f_ang_sols) # false )
+            then (
+                        case_f_val: assoc(f, case_f_ang_sols) 
+            )
+            else (
+                    case_f_val: NA
+            ),
+            
+
+            case_ang_vals: [],
+
+
+            if ( case_ang_sols # emptyset )
+            then (
+
+                    for v_ind:1 thru length(case_ang_sols)-1 do (
+
+                    case_ang_vals: append(case_ang_vals, [rhs(case_ang_sols[v_ind])])
+
+                ),
+
+                    case_area: lsum(ang, ang, case_ang_vals)-(Gonality-2)*%pi
+            )
+            else (
+                    case_ang_vals: emptyset,
+                    case_area: emptyset
+            ),
+
+
+            if ( ACTIVATE_POSITIVE_ANG_FILTER )
+            and ( case_ang_vals # emptyset )
+            then ( 
+                    positive_val_filter: not(Exists_Less(case_ang_vals,0))
+            )
+            else (
+                    positive_val_filter: true
+            ),
+
+            if ( ACTIVATE_UNDER_2PI_ANG_FILTER )
+            and ( case_ang_vals # emptyset )
+            then (
+                    under_2pi_val_filter: not(Exists_Greater(case_ang_vals,2*%pi))
+            )
+            else (
+                    under_2pi_val_filter: true
+            ),
+
+
+            if ( ACTIVATE_AREA_FILTER )
+            then (
+                    area_filter: is( case_area > 0 )
+            )
+            else (
+                    area_filter: true
+            ),
+
+            if ( ACTIVATE_f_VALUE_FILTER )
+            then (
+                    f_val_filter: ( ( is(case_f_val >= f_LB) ) and ( evenp(case_f_val) ) )
+            )
+            else (
+                    f_val_filter: true
+            ),
+
+            if ( ACTIVATE_GEOM_INEQ_FILTER )
+            then (
+                    if ( case_ang_vals # [] )
+                    then (
+                            geom_ineq_filter: ( 
+                                                (
+                                                     ( is( case_ang_vals[1] > case_ang_vals[2] ) )
+                                                     and ( is( case_ang_vals[4] < case_ang_vals[3] ) )
+                                                )
+          or 
+                                                (
+                      ( is( case_ang_vals[1] < case_ang_vals[2] ) )
+                                                     and ( is( case_ang_vals[4] > case_ang_vals[3] ) )
+                                                )
+
+                            )
+                    )
+                    else (
+                            geom_ineq_filter: false
+                    )
+
+            )
+            else (
+                    geom_ineq_filter: true
+            ),
+
+            counter: counter + 1,
+
+            if ( area_filter )
+            and ( f_val_filter )
+            and ( geom_ineq_filter )
+            and ( case_ang_sols # emptyset )
+            and ( positive_val_filter )
+            and ( under_2pi_val_filter )
+            and ( (case_f_val=NA) or ( (evenp(case_f_val)) and (case_f_val >= f_LB) ) )
+
+            then (
+
+                    Valid_Angle_Index_List: append(Valid_Angle_Index_List, [counter]),
+
+                    Full_Valid_Angle_Values: append( Full_Valid_Angle_Values, 
+                                        [append(case_ang_sols, [f=case_f_val])]
+                    ),
+
+                    Valid_Angle_Value_List: append( Valid_Angle_Value_List,
+                                            [case_ang_vals]
+
+                    )
+            ),
+
+
+            if (DISPLAY_PROGRESS)
+            then (
+                    display (
+                                counter,
+                                case_vals,
+                                case_eq_list,
+                                case_ang_sols,
+                                case_f_ang_sols,
+                                case_ang_vals,
+                                if (case_ang_sols#emptyset) 
+                                then (lsum(x,x,Firstn(case_ang_sols, 4))),
+                                case_area, 
+                                area_filter,
+                                /* case_f_val, */
+                                f_val_filter,
+                                geom_ineq_filter,
+                                "========================================"
+
+                    )
+
+            )
+
+
+
+        )
+
+
+)
+
+);
+
+counter;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Valid_Angle_Value_List;
+length(%);
+unique(Valid_Angle_Value_List);
+length(%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Double_List:[
+[[3,0,0,0], [1,0,2,0]],
+[[3,0,0,0], [1,0,0,2]],
+[[3,0,0,0], [0,1,2,0]],
+[[3,0,0,0], [0,1,0,2]],
+[[2,1,0,0], [1,0,2,0]],
+[[2,1,0,0], [1,0,0,2]],
+[[2,1,0,0], [0,1,2,0]],
+[[2,1,0,0], [0,1,0,2]],
+[[1,0,0,2], [0,1,2,0]],
+
+[[3,0,0,0], [0,0,4,0]],
+[[3,0,0,0], [0,0,0,4]],
+[[3,0,0,0], [0,0,3,1]],
+[[3,0,0,0], [0,0,1,3]],
+[[3,0,0,0], [0,0,2,2]],
+[[1,2,0,0], [0,0,4,0]],
+[[1,2,0,0], [0,0,0,4]],
+[[1,2,0,0], [0,0,3,1]],
+[[1,2,0,0], [0,0,1,3]],
+[[1,2,0,0], [0,0,2,2]],
+[[1,0,2,0], [4,0,0,0]],
+[[1,0,2,0], [0,4,0,0]],
+[[1,0,2,0], [0,0,0,4]],
+[[1,0,2,0], [3,1,0,0]],
+[[1,0,2,0], [1,3,0,0]],
+[[1,0,2,0], [2,2,0,0]],
+[[1,0,2,0], [2,0,0,2]],
+[[1,0,2,0], [0,2,0,2]],
+[[1,0,2,0], [1,1,0,2]],
+[[1,0,0,2], [4,0,0,0]],
+[[1,0,0,2], [0,4,0,0]],
+[[1,0,0,2], [0,0,4,0]],
+[[1,0,0,2], [3,1,0,0]],
+[[1,0,0,2], [1,3,0,0]],
+[[1,0,0,2], [2,2,0,0]],
+[[1,0,0,2], [2,0,2,0]],
+[[1,0,0,2], [0,2,2,0]],
+[[1,0,0,2], [1,1,2,0]]
+];
+length(%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Double_Equality_List: [];
+
+Double_f_Values: [];
+
+Valid_Double_List: [];
+
+v_list: Valid_Angle_Value_List$
+
+run_list: Double_List$
+
+
+for v_ind: 1 thru length(v_list) do (
+
+    for r_ind: 1 thru  length(run_list) do (
+
+        member_eq: [],
+
+        member_f: [],
+
+        for m_ind: 1 thru length(run_list[r_ind]) do (
+
+            vertex_f: [],
+
+            vertex_ang_sum: expand(run_list[r_ind][m_ind].v_list[v_ind]),
+
+            if ( coeff(vertex_ang_sum, 1/f) # 0 )
+            then (
+
+                    if ( solve(vertex_ang_sum=2*%pi, f)#[] )
+                    then (
+                             vertex_f_val: rhs(solve(vertex_ang_sum=2*%pi, f)[1]),
+
+                             if ( vertex_f_val # [] )
+                             and ( integerp(vertex_f_val) )
+                             and ( evenp(vertex_f_val) )
+                             and ( vertex_f_val>=f_LB )
+                             then (
+                                    vertex_f: [f=vertex_f_val]
+                            )   
+                              
+                    )
+                    else (
+                            vertex_f: []
+                    )
+
+                    
+            )
+            else (
+
+                    if ( is(vertex_ang_sum = 2*%pi) )        
+                    then (
+                            vertex_f: [ALL]
+                    )
+                    else ( 
+                            vertex_f: []
+                    )
+                    
+            ),
+
+            member_f: append(member_f, [vertex_f]),
+
+            member_eq:  append(member_eq, 
+                        [expand(vertex_ang_sum=2*%pi)]
+                        )
+
+        ),
+
+
+        if (
+             ( member([ALL],  member_f) )
+              and ( member([],  member_f) = false )
+        )
+
+        or ( 
+
+            ( member([ALL],  member_f)=false )
+            and ( member_f[1] = member_f[2] )
+            and ( member_f[1] # [] )
+            and ( member_f[2] # [] ) 
+        ) 
+
+        
+
+        then (
+                Valid_Double_List: append(Valid_Double_List, [[run_list[r_ind],v_list[v_ind], member_f]]),
+
+                Double_f_Values: append(Double_f_Values, [member_f]),
+
+                Double_Equality_List: append(Double_Equality_List, [member_eq])
+
+        )
+
+    )
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+counter: 0$
+
+Final_Double_List: [];
+
+d_list: Valid_Double_List$
+
+for d_ind: 1 thru length(d_list) do (
+
+    if ( d_list[d_ind][3] # [[ALL],[ALL]] ) 
+    then (
+            case_angles: subst(delete(ALL,flatten(d_list[d_ind][3])),d_list[d_ind][2])
+    )
+    else (
+            case_angles: d_list[d_ind][2]
+    ),
+
+    if (  d_list[d_ind][3] = [ [ALL], [ALL] ] )
+    or ( 
+          /* LOWER BOUND REQUIREMENT FOR f */
+          (  
+
+            /* LOWER BOUND REQUIREMENT FOR f: 33 DOUBLES */
+            ( ( max( lsum(i,i,d_list[d_ind][1][1]), lsum(i,i,d_list[d_ind][1][2]) ) < 4 )
+                and ( ( rhs(flatten(d_list[d_ind][3])[1]) >= f_LB ) or ( rhs(flatten(d_list[d_ind][3])[2]) >= f_LB ) )
+            )
+
+            /* LOWER BOUND REQUIREMENT FOR f: 34 DOUBLES */
+            or ( ( max( lsum(i,i,d_list[d_ind][1][1]), lsum(i,i,d_list[d_ind][1][2]) ) = 4 )
+                 and (
+                         /* LOWER BOUND REQUIREMENT FOR f: 34 DOUBLES - alpha^3 */
+                        ( member([3,0,0,0],d_list[d_ind][1]) 
+                            and ( rhs(flatten(d_list[d_ind][3])[1]) >= 24 or rhs(flatten(d_list[d_ind][3])[2]) >= 24 ) )
+
+                             /* LOWER BOUND REQUIREMENT FOR f: 34 DOUBLES - NOT alpha^3 */
+                        or ( not(member([3,0,0,0],d_list[d_ind][1])) 
+                                and ( rhs(flatten(d_list[d_ind][3])[1]) >= 16 or rhs(flatten(d_list[d_ind][3])[2]) >= 16 ) )
+                 )
+                 
+            )
+
+          )
+          and ( integerp(rhs(flatten(d_list[d_ind][3])[1])) )  
+          and ( evenp(rhs(flatten(d_list[d_ind][3])[1])) )
+          and ( not( case_angles[1] = case_angles[2] ) )
+          and ( not( case_angles[3] = case_angles[4] ) )
+
+    )
+    then (
+            Final_Double_List: append(Final_Double_List, [
+                    [
+                      [alpha^(d_list[d_ind][1][1][1])*beta^(d_list[d_ind][1][1][2])*gamma^(d_list[d_ind][1][1][3])*delta^(d_list[d_ind][1][1][4]),
+                        alpha^(d_list[d_ind][1][2][1])*beta^(d_list[d_ind][1][2][2])*gamma^(d_list[d_ind][1][2][3])*delta^(d_list[d_ind][1][2][4])
+                      ],
+                      case_angles,
+                      d_list[d_ind][3]
+                    ]
+                    ]
+                )
+    ),
+
+    display(
+
+                counter: counter+1,
+                case_double = [alpha^(d_list[d_ind][1][1][1])*beta^(d_list[d_ind][1][1][2])*gamma^(d_list[d_ind][1][1][3])*delta^(d_list[d_ind][1][1][4]),
+                 alpha^(d_list[d_ind][1][2][1])*beta^(d_list[d_ind][1][2][2])*gamma^(d_list[d_ind][1][2][3])*delta^(d_list[d_ind][1][2][4])],
+                case_angles_f_values=d_list[d_ind][3],
+                case_angles_values=case_angles,
+                case_coolsaet_difference=subst([alpha=case_angles[1], beta=case_angles[2], 
+                        gamma=case_angles[3], delta=case_angles[4]], Coolsaet_Diff),
+                
+                "============================================================="
+                
+    )
+
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+display_list: unique(Final_Double_List)$
+
+Unique_Angle_Values: [];
+
+for d_ind: 1 thru length(display_list) do (
+
+    Unique_Angle_Values: append(Unique_Angle_Values, [setify(display_list[d_ind][2])]),
+
+    display(
+                display_list[d_ind],
+           
+                "======================================"
+
+    )
+
+);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+[(4*%pi)/f+%pi/3,(5*%pi)/6−(2*%pi)/f,(3*%pi)/f+%pi/4,(7*%pi)/12−%pi/f];
+subst([f=16],%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* ----------------- TESTING BELOW ----------------- */;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+unique(Unique_Angle_Values);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Single_List:[
+
+[3,0,0,0], 
+[2,1,0,0], 
+[1,2,0,0],
+[1,0,2,0],
+[1,0,0,2],
+[0,1,2,0],
+[0,1,0,2],
+
+[4,0,0,0],
+[0,4,0,0],
+[3,1,0,0],
+[1,3,0,0],
+[2,2,0,0],
+
+[0,0,4,0],
+[0,0,0,4],
+[0,0,3,1],
+[0,0,1,3],
+[0,0,2,2],
+
+[2,0,2,0],
+[2,0,0,2],
+[0,2,2,0],
+[0,2,0,2],
+
+[1,1,2,0],
+[1,1,0,2]
+
+];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+counter: 0$
+
+run_list: Single_List$
+
+test_value_set: [(5*%pi)/6−(2*%pi)/f,(4*%pi)/f+%pi/3,(7*%pi)/12−%pi/f,(3*%pi)/f+%pi/4];
+
+for r_ind:1 thru length(run_list) do (
+
+    test_sum: expand(test_value_set.run_list[r_ind]),
+    test_f: solve(test_value_set.run_list[r_ind]=2*%pi,f),
+
+    if ( (coeff(test_sum, 1/f)=0) and (test_sum =2*%pi) /*  */ )
+    or (
+            ( test_f#[] )
+            and ( evenp(rhs(test_f[1])) )
+            and ( rhs(test_f[1])>=f_LB )
+    ) 
+    then /* */
+    (
+            display(
+                        counter: counter+1,
+                        alpha^(run_list[r_ind][1])*beta^(run_list[r_ind][2])*gamma^(run_list[r_ind][3])*delta^(run_list[r_ind][4]),
+                        run_list[r_ind],
+                        test_sum,
+                        test_f,
+                        "======================================"
+
+    )
+
+    )
+
+);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

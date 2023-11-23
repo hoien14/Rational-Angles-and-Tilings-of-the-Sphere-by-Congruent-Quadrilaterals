@@ -1,0 +1,133 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 13.04.0 ] */
+
+/* [wxMaxima: input   start ] */
+/* --------------------------- LOAD PACKAGES --------------------------- */
+
+load(fourier_elim);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* ---------------------- USER INPUT  ---------------------- */
+
+Gonality: 4;
+
+f_LB: 6;
+
+assume(f>=6);
+
+Quad_Angles: [alpha, beta, gamma, delta];
+
+Ngon_Angles: copylist(%);
+
+Ang_Vars: listofvars(Ngon_Angles);
+
+Ngon_Angle_Sum: lsum(ang, ang, Ngon_Angles);
+
+Ngon_Angle_Sum_Eq: lsum(ang, ang, Ngon_Angles)=(Gonality-2)*%pi + 4*%pi/f;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Type_I_Equality_List: [
+Ngon_Angle_Sum_Eq,
+alpha = 2*gamma,
+beta = 2*delta
+];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Double_List:[
+[[3,0,0,0], [1,0,2,0]],
+[[3,0,0,0], [1,0,0,2]],
+[[3,0,0,0], [0,1,2,0]],
+[[3,0,0,0], [0,1,0,2]],
+[[2,1,0,0], [1,0,2,0]],
+[[2,1,0,0], [1,0,0,2]],
+[[2,1,0,0], [0,1,2,0]],
+[[2,1,0,0], [0,1,0,2]],
+[[1,0,0,2], [0,1,2,0]],
+
+[[3,0,0,0], [0,0,4,0]],
+[[3,0,0,0], [0,0,0,4]],
+[[3,0,0,0], [0,0,3,1]],
+[[3,0,0,0], [0,0,1,3]],
+[[3,0,0,0], [0,0,2,2]],
+[[1,2,0,0], [0,0,4,0]],
+[[1,2,0,0], [0,0,0,4]],
+[[1,2,0,0], [0,0,3,1]],
+[[1,2,0,0], [0,0,1,3]],
+[[1,2,0,0], [0,0,2,2]],
+[[1,0,2,0], [4,0,0,0]],
+[[1,0,2,0], [0,4,0,0]],
+[[1,0,2,0], [0,0,0,4]],
+[[1,0,2,0], [3,1,0,0]],
+[[1,0,2,0], [1,3,0,0]],
+[[1,0,2,0], [2,2,0,0]],
+[[1,0,2,0], [2,0,0,2]],
+[[1,0,2,0], [0,2,0,2]],
+[[1,0,2,0], [1,1,0,2]],
+[[1,0,0,2], [4,0,0,0]],
+[[1,0,0,2], [0,4,0,0]],
+[[1,0,0,2], [0,0,4,0]],
+[[1,0,0,2], [3,1,0,0]],
+[[1,0,0,2], [1,3,0,0]],
+[[1,0,0,2], [2,2,0,0]],
+[[1,0,0,2], [2,0,2,0]],
+[[1,0,0,2], [0,2,2,0]],
+[[1,0,0,2], [1,1,2,0]]
+];
+length(%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Double_Equality_List: [];
+
+run_list: Double_List;
+
+for r_ind: 1 thru length(run_list) do (
+
+    member_eq: [],
+
+    for m_ind: 1 thru length(run_list[r_ind]) do (
+
+        member_eq: append(member_eq, [run_list[r_ind][m_ind].Ngon_Angles=2*%pi])
+
+    ),
+
+    Double_Equality_List: append(Double_Equality_List, [member_eq])
+
+);
+
+Double_Equality_List;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+run_list: Double_Equality_List;
+
+for r_ind:1 thru length(run_list) do (
+
+    case_equality_list: append(Type_I_Equality_List, run_list[r_ind]),
+
+    case_ang_sol: expand(
+                            fourier_elim(case_equality_list, listofvars(Ngon_Angles))
+                    ),
+    
+    case_f_ang_sol: expand(
+                            fourier_elim(case_equality_list, append(listofvars(Ngon_Angles),[f]))
+                    ),
+
+    display(
+
+                Double_List[r_ind],
+                run_list[r_ind],
+                case_ang_sol,
+                case_f_ang_sol,
+                "==================================================================="
+
+    )
+
+);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
